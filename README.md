@@ -1,6 +1,7 @@
 # todo
-A Simple TODO List WebSite
+A Simple TODO App
 
+![](/imgs/preview.png)
 ## Dependencies
 - Go
 - node
