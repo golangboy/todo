@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -22,32 +21,38 @@ type Response struct {
 
 func main() {
 	g := gin.Default()
-	g.StaticFS("/web", http.Dir("../dist/"))
-	g.POST("/add", func(ctx *gin.Context) {
-		fmt.Println("1")
-		var param Todo
-		ctx.BindJSON(&param)
-		bytes, _ := json.Marshal(param)
-		fmt.Println("2")
-		err := os.WriteFile("data.json", bytes, 0666)
-		if err == nil {
-			ctx.JSON(http.StatusOK, Response{Err: err, Data: nil})
-		} else {
-			ctx.JSON(http.StatusOK, Response{Err: err, Data: nil})
+	g.NoRoute(func(ctx *gin.Context) {
+
+		if ctx.Request.Method == "GET" && ctx.Request.URL.Path == "/list" {
+			var ret Todo
+			bytes, _ := os.ReadFile("data.json")
+			err := json.Unmarshal(bytes, &ret)
+			if err == nil {
+				ctx.JSON(http.StatusOK, Response{Err: err, Data: ret})
+			} else {
+				ctx.JSON(http.StatusOK, Response{Err: err, Data: nil})
+			}
+			return
 		}
-	})
-	g.GET("/list", func(ctx *gin.Context) {
-		var ret Todo
-		bytes, _ := os.ReadFile("data.json")
-		err := json.Unmarshal(bytes, &ret)
-		if err == nil {
-			ctx.JSON(http.StatusOK, Response{Err: err, Data: ret})
-		} else {
-			ctx.JSON(http.StatusOK, Response{Err: err, Data: nil})
+		if ctx.Request.Method == "POST" && ctx.Request.URL.Path == "/add" {
+			var param Todo
+			ctx.BindJSON(&param)
+			bytes, _ := json.Marshal(param)
+			err := os.WriteFile("data.json", bytes, 0666)
+			if err == nil {
+				ctx.JSON(http.StatusOK, Response{Err: err, Data: nil})
+			} else {
+				ctx.JSON(http.StatusOK, Response{Err: err, Data: nil})
+			}
+			return
 		}
-	})
-	g.GET("/", func(ctx *gin.Context) {
-		ctx.Redirect(http.StatusTemporaryRedirect, "/web")
+		var p string
+		if p == "/" {
+			p = "index.html"
+		} else {
+			p = ctx.Request.URL.Path[1:]
+		}
+		ctx.File("../dist/" + p)
 	})
 	g.Run(":8089")
 }

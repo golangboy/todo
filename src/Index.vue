@@ -2,7 +2,7 @@
   <div>
     <div style="display: flex">
       <el-input
-        placeholder="fixBug of GoOut"
+        placeholder="I should do ..."
         style="margin-right: 20px; margin-left: 20px"
         v-model="title"
       ></el-input>
