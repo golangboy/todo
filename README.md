@@ -11,3 +11,4 @@ A Simple TODO App
 
 1. npm install
 2. npm run server
+3. browse http://localhost:8089
